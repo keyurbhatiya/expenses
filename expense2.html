@@ -1,270 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Expense Tracker</title>
-<script src="https://cdn.tailwindcss.com/3.4.16"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
-<style>
-:where([class^="ri-"])::before { content: "\f3c2"; }
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
--webkit-appearance: none;
-margin: 0;
-}
-input[type="number"] {
--moz-appearance: textfield;
-}
-.expense-item {
-animation: fadeIn 0.3s ease-in-out;
-}
-@keyframes fadeIn {
-from { opacity: 0; transform: translateY(-10px); }
-to { opacity: 1; transform: translateY(0); }
-}
-.expense-delete {
-animation: fadeOut 0.3s ease-in-out;
-}
-@keyframes fadeOut {
-from { opacity: 1; transform: translateY(0); }
-to { opacity: 0; transform: translateY(10px); }
-}
-</style>
-<script>tailwind.config={theme:{extend:{colors:{primary:'#4f46e5',secondary:'#10b981'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        income: '#10b981',
+                        expense: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4 font-sans">
-<div class="w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden">
-<!-- Header -->
-<div class="p-6 border-b border-gray-100">
-<h1 class="text-2xl font-semibold text-gray-800">Expense Tracker</h1>
-<p class="text-gray-500 mt-1">Track your daily expenses easily</p>
-</div>
-<!-- Input Form -->
-<div class="p-6 border-b border-gray-100">
-<form id="expense-form" class="space-y-4">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-<div>
-<label for="expense-name" class="block text-sm font-medium text-gray-700 mb-1">Expense Name</label>
-<div class="relative">
-<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none w-10 h-10">
-<i class="ri-price-tag-3-line text-gray-400"></i>
-</div>
-<input type="text" id="expense-name" class="w-full pl-10 pr-3 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" placeholder="Groceries, Rent, etc." required>
-</div>
-</div>
-<div>
-<label for="expense-amount" class="block text-sm font-medium text-gray-700 mb-1">Amount (₹)</label>
-<div class="relative">
-<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none w-10 h-10">
-<i class="ri-money-dollar-circle-line text-gray-400"></i>
-</div>
-<input type="number" id="expense-amount" min="0.01" step="0.01" class="w-full pl-10 pr-3 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" placeholder="0.00" required>
-</div>
-</div>
-<div class="md:col-span-2">
-<label for="expense-date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-<div class="relative">
-<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none w-10 h-10">
-<i class="ri-calendar-line text-gray-400"></i>
-</div>
-<input type="datetime-local" id="expense-date" class="w-full pl-10 pr-3 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required>
-</div>
-</div>
-</div>
-<button type="submit" class="w-full bg-primary text-white py-2 px-4 rounded-button hover:bg-primary/90 transition flex items-center justify-center gap-2 whitespace-nowrap">
-<div class="w-5 h-5 flex items-center justify-center">
-<i class="ri-add-line"></i>
-</div>
-Add Expense
-</button>
-</form>
-</div>
-<!-- Expense List -->
-<div class="p-6 border-b border-gray-100">
-<h2 class="text-lg font-medium text-gray-800 mb-4">Expense List</h2>
-<div id="expense-list" class="max-h-96 overflow-y-auto space-y-2">
-<div class="text-gray-500 text-center py-4">No expenses added yet</div>
-</div>
-</div>
-<!-- Total Section -->
-<div class="p-6 bg-gray-50">
-<div class="flex justify-between items-center">
-<h2 class="text-lg font-medium text-gray-800">Total Spent:</h2>
-<div id="total-amount" class="text-xl font-bold text-primary">₹0.00</div>
-</div>
-<div class="mt-4 flex gap-2">
-<button id="clear-all" class="flex-1 bg-white border border-gray-200 text-gray-700 py-2 px-4 rounded-button hover:bg-gray-50 transition flex items-center justify-center gap-2 whitespace-nowrap">
-<div class="w-5 h-5 flex items-center justify-center">
-<i class="ri-delete-bin-line"></i>
-</div>
-Clear All
-</button>
-<button id="download-csv" class="flex-1 bg-secondary text-white py-2 px-4 rounded-button hover:bg-secondary/90 transition flex items-center justify-center gap-2 whitespace-nowrap">
-<div class="w-5 h-5 flex items-center justify-center">
-<i class="ri-download-line"></i>
-</div>
-Export CSV
-</button>
-</div>
-</div>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-const expenseDateInput = document.getElementById('expense-date');
-const now = new Date();
-now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-expenseDateInput.value = now.toISOString().slice(0, 16);
-const expenseForm = document.getElementById('expense-form');
-const expenseNameInput = document.getElementById('expense-name');
-const expenseAmountInput = document.getElementById('expense-amount');
-const expenseList = document.getElementById('expense-list');
-const totalAmount = document.getElementById('total-amount');
-const clearAllBtn = document.getElementById('clear-all');
-const downloadCsvBtn = document.getElementById('download-csv');
-let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-// Initialize
-renderExpenses();
-updateTotal();
-// Add expense
-expenseForm.addEventListener('submit', function(e) {
-e.preventDefault();
-const name = expenseNameInput.value.trim();
-const amount = parseFloat(expenseAmountInput.value);
-if (name && amount > 0) {
-const expenseDate = document.getElementById('expense-date').value;
-const expense = {
-id: Date.now(),
-name,
-amount,
-date: expenseDate ? new Date(expenseDate).toISOString() : new Date().toISOString()
-};
-expenses.push(expense);
-saveExpenses();
-renderExpenses();
-updateTotal();
-expenseForm.reset();
-expenseNameInput.focus();
-}
-});
-// Delete expense
-expenseList.addEventListener('click', function(e) {
-if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
-const item = e.target.closest('.expense-item');
-const id = parseInt(item.dataset.id);
-item.classList.add('expense-delete');
-setTimeout(() => {
-expenses = expenses.filter(expense => expense.id !== id);
-saveExpenses();
-renderExpenses();
-updateTotal();
-}, 300);
-}
-});
-// Clear all expenses
-clearAllBtn.addEventListener('click', function() {
-if (expenses.length === 0) return;
-if (confirm('Are you sure you want to clear all expenses?')) {
-expenses = [];
-saveExpenses();
-renderExpenses();
-updateTotal();
-}
-});
-// Download CSV
-downloadCsvBtn.addEventListener('click', function() {
-if (expenses.length === 0) {
-alert('No expenses to export');
-return;
-}
-const headers = ['Date', 'Name', 'Amount'];
-const csvContent = [
-headers.join(','),
-...expenses.map(expense => {
-const date = new Date(expense.date).toLocaleDateString();
-return `${date},"${expense.name}",${expense.amount.toFixed(2)}`;
-})
-].join('\n');
-const blob = new Blob([csvContent], { type: 'text/csv' });
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url;
-a.download = `expenses-${new Date().toLocaleDateString()}.csv`;
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-URL.revokeObjectURL(url);
-});
-// Helper functions
-function renderExpenses() {
-if (expenses.length === 0) {
-expenseList.innerHTML = '<div class="text-gray-500 text-center py-4">No expenses added yet</div>';
-return;
-}
-expenseList.innerHTML = '';
-const groupedExpenses = expenses.reduce((groups, expense) => {
-const date = new Date(expense.date).toLocaleDateString();
-if (!groups[date]) {
-groups[date] = [];
-}
-groups[date].push(expense);
-return groups;
-}, {});
-Object.entries(groupedExpenses)
-.sort(([dateA], [dateB]) => new Date(dateB) - new Date(dateA))
-.forEach(([date, dayExpenses]) => {
-const dateGroup = document.createElement('div');
-dateGroup.className = 'mb-4';
-const dateHeader = document.createElement('div');
-dateHeader.className = 'flex items-center justify-between mb-2';
-const today = new Date().toLocaleDateString();
-const yesterday = new Date(Date.now() - 86400000).toLocaleDateString();
-let dateText = date;
-if (date === today) {
-dateText = 'Today';
-} else if (date === yesterday) {
-dateText = 'Yesterday';
-}
-const totalForDay = dayExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-dateHeader.innerHTML = `
-<div class="text-sm font-medium text-gray-600">${dateText}</div>
-<div class="text-sm font-medium text-gray-600">₹${totalForDay.toFixed(2)}</div>
-`;
-dateGroup.appendChild(dateHeader);
-dayExpenses
-.sort((a, b) => new Date(b.date) - new Date(a.date))
-.forEach(expense => {
-const item = document.createElement('div');
-item.className = 'expense-item flex items-center justify-between p-3 rounded bg-gray-50 hover:bg-gray-100 transition mb-2';
-item.dataset.id = expense.id;
-item.innerHTML = `
-<div class="flex-1">
-<div class="font-medium text-gray-800">${expense.name}</div>
-<div class="text-xs text-gray-500">${new Date(expense.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-</div>
-<div class="flex items-center gap-3">
-<div class="font-medium text-gray-800">₹${expense.amount.toFixed(2)}</div>
-<button class="delete-btn w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 transition">
-<i class="ri-close-line"></i>
-</button>
-</div>
-`;
-dateGroup.appendChild(item);
-});
-expenseList.appendChild(dateGroup);
-});
-}
-function updateTotal() {
-const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-totalAmount.textContent = `₹${total.toFixed(2)}`;
-}
-function saveExpenses() {
-localStorage.setItem('expenses', JSON.stringify(expenses));
-}
-});
-</script>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen p-4 sm:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        
+        <header class="mb-8 text-center sm:text-left">
+            <h1 class="text-3xl font-bold text-gray-900">Finance Tracker</h1>
+            <p class="text-gray-500">Track your income and expenses simply.</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-income">
+                <p class="text-sm text-gray-500 font-medium">Total Income</p>
+                <p class="text-2xl font-bold text-gray-900" id="totalIncome">$0.00</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-expense">
+                <p class="text-sm text-gray-500 font-medium">Total Expense</p>
+                <p class="text-2xl font-bold text-gray-900" id="totalExpense">$0.00</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-primary">
+                <p class="text-sm text-gray-500 font-medium">Net Balance</p>
+                <p class="text-2xl font-bold text-gray-900" id="netBalance">$0.00</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <section class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm h-fit sticky top-4">
+                <h2 class="text-xl font-bold mb-4">Add Transaction</h2>
+                <form id="trackerForm" class="space-y-4">
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="type" value="Income" class="peer sr-only" required>
+                                <div class="p-2 text-center border rounded-md peer-checked:bg-income peer-checked:text-white transition">Income</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="type" value="Expense" class="peer sr-only" checked required>
+                                <div class="p-2 text-center border rounded-md peer-checked:bg-expense peer-checked:text-white transition">Expense</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
+                        <input type="date" id="date" name="date" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2 border">
+                    </div>
+
+                    <div>
+                        <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+                        <select id="category" name="category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2 border">
+                            <option>Food</option>
+                            <option>Rent</option>
+                            <option>Salary</option>
+                            <option>Transport</option>
+                            <option>Utilities</option>
+                            <option>Entertainment</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
+                        <input type="number" id="amount" name="amount" step="0.01" required placeholder="0.00" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2 border">
+                    </div>
+
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                        <input type="text" id="description" name="description" placeholder="Short description..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2 border">
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full bg-primary text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition flex justify-center items-center">
+                        <span>Add Transaction</span>
+                        <div id="spinner" class="hidden ml-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    </button>
+                </form>
+            </section>
+
+            <section class="lg:col-span-2">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">Recent History</h2>
+                    <select id="filter" class="text-sm border-gray-300 rounded-md shadow-sm border p-1">
+                        <option value="All">All</option>
+                        <option value="Income">Income</option>
+                        <option value="Expense">Expense</option>
+                    </select>
+                </div>
+                
+                <div class="bg-white shadow-sm rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionList" class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td colspan="3" class="px-6 py-4 text-center text-gray-500">Loading data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwVSM88xGBoSVntmp1Um9VlbwLERz3_1DadzyHuvclHnjG4WuJUxHWtTIOsnYIgSner/exec';
+
+        // DOM Elements
+        const form = document.getElementById('trackerForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const spinner = document.getElementById('spinner');
+        const listContainer = document.getElementById('transactionList');
+        const filterSelect = document.getElementById('filter');
+        
+        let allTransactions = [];
+
+        // Set today's date in input
+        document.getElementById('date').valueAsDate = new Date();
+
+        // --- Fetch Data ---
+        async function loadData() {
+            try {
+                const response = await fetch(API_URL);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    allTransactions = result.data;
+                    updateUI();
+                }
+            } catch (error) {
+                console.error("Error loading data:", error);
+                listContainer.innerHTML = `<tr><td colspan="3" class="text-center text-red-500 py-4">Error loading data. Check console.</td></tr>`;
+            }
+        }
+
+        // --- Calculate & Update UI ---
+        function updateUI() {
+            const filterType = filterSelect.value;
+            let income = 0;
+            let expense = 0;
+
+            // Filter
+            const filtered = allTransactions.filter(t => filterType === 'All' || t.type === filterType);
+
+            // Calculate Totals (based on ALL data, not just filtered view)
+            allTransactions.forEach(t => {
+                const amt = parseFloat(t.amount);
+                if (t.type === 'Income') income += amt;
+                if (t.type === 'Expense') expense += amt;
+            });
+
+            // Update Cards
+            document.getElementById('totalIncome').textContent = formatCurrency(income);
+            document.getElementById('totalExpense').textContent = formatCurrency(expense);
+            document.getElementById('netBalance').textContent = formatCurrency(income - expense);
+
+            // Render List
+            renderTable(filtered);
+        }
+
+        function renderTable(data) {
+            if (data.length === 0) {
+                listContainer.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-gray-500">No transactions found.</td></tr>';
+                return;
+            }
+
+            listContainer.innerHTML = data.map(t => {
+                const isIncome = t.type === 'Income';
+                const dateObj = new Date(t.date);
+                const formattedDate = dateObj.toLocaleDateString();
+                const sign = isIncome ? '+' : '-';
+                const colorClass = isIncome ? 'text-income' : 'text-expense';
+
+                return `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formattedDate}</td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-medium text-gray-900">${t.category}</div>
+                            <div class="text-sm text-gray-500">${t.description || ''}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold ${colorClass}">
+                            ${sign}${formatCurrency(t.amount)}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // --- Submit Data ---
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // UI Loading State
+            submitBtn.disabled = true;
+            submitBtn.querySelector('span').textContent = "Saving...";
+            spinner.classList.remove('hidden');
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                // We use 'no-cors' mode is trickier with POST, so we send as text/plain
+                // to avoid complex CORS preflight checks in GAS.
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+
+                // Clear form and reload
+                form.reset();
+                document.getElementById('date').valueAsDate = new Date();
+                
+                // Optimistic UI update (optional, but we'll just reload for accuracy)
+                await loadData();
+
+            } catch (error) {
+                alert('Error submitting transaction');
+                console.error(error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.querySelector('span').textContent = "Add Transaction";
+                spinner.classList.add('hidden');
+            }
+        });
+
+        // Filter Listener
+        filterSelect.addEventListener('change', updateUI);
+
+        // Helper
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+        }
+
+        // Init
+        loadData();
+
+    </script>
 </body>
 </html>
